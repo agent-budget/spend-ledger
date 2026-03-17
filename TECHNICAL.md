@@ -51,7 +51,7 @@ agent-budget is designed to need as little access as possible:
 |---|---|---|
 | Read tool call results | Yes | Core function — detecting payments |
 | Write to its own data directory | Yes | Transaction log, tracked tools, submissions |
-| Network access (outbound) | **No** | Never sends data externally |
+| Network access (outbound) | Fetch only | Fetches `api.agent-budget.net/patterns.json` hourly — no payment data included |
 | Network access (inbound) | Localhost only | Dashboard server binds to `127.0.0.1`, never `0.0.0.0` |
 | Wallet keys or credentials | **No** | Observes results, never initiates payments |
 | Shell execution (exec) | **No** | Shell scripts are tools the agent calls, not the skill itself |
@@ -147,7 +147,11 @@ send_money|donate|checkout|purchase|buy|invoice|subscribe|billing
 
 Users can add custom tool patterns via the dashboard's "Track Tools" tab or the `POST /api/tracked-tools` endpoint. Patterns can be exact tool names or regex. User-tracked patterns have the highest detector priority — they fire before any built-in detector.
 
-When adding a tracked tool, users can optionally check "Send to agent-budget maintainers." This appends the pattern to `data/submissions.jsonl` — a local file that can be reviewed and submitted upstream. Nothing is sent automatically; the file is a staging area.
+### Community Patterns
+
+On startup and every hour, the skill fetches `api.agent-budget.net/patterns.json` and caches it to `data/community-patterns.json`. `detectUserTracked()` merges local and community patterns at detection time — local patterns take priority on any conflict. This allows the published pattern list to expand without requiring a skill update.
+
+Community patterns are maintained at [github.com/mattpolly/agent-budget.net](https://github.com/mattpolly/agent-budget.net). The fetch is read-only; no payment data or transaction records are included in any request to that host. The only outbound write is an opt-in pattern submission from the dashboard (`data/submissions.jsonl` records what was sent locally).
 
 ### Adding New Detectors
 
@@ -238,7 +242,9 @@ Each record is a single JSON object, one per line in `transactions.jsonl`:
 |---|---|---|
 | `data/transactions.jsonl` | Transaction log | On first payment detection |
 | `data/tracked-tools.json` | User-defined tool patterns | On first tracked tool addition |
-| `data/submissions.jsonl` | Suggestions for maintainers | On first submission |
+| `data/community-patterns.json` | Cached community pattern list | On first successful sync |
+| `data/install-id.json` | Stable per-install UUID (opt-in submissions only) | On first opt-in submission |
+| `data/submissions.jsonl` | Local log of patterns sent to maintainers | On first opt-in submission |
 | `data/dashboard.pid` | Dashboard server PID | On dashboard start |
 
 All files are created with mode `0600` (owner read/write only).

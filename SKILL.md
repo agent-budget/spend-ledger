@@ -62,7 +62,8 @@ When a tool call completes, agent-budget inspects the tool name, arguments, and 
 - **Known wallet tools**: agent-wallet-cli (x402), v402, ClawRouter, payment-skill
 - **Heuristic detection**: tools named `stripe_*`, `paypal_*`, `checkout`, `purchase`, `buy`, etc., plus argument patterns containing monetary amounts with currency/recipient signals
 - **Generic x402**: any tool response containing `X-PAYMENT-RESPONSE` headers or x402 payment confirmations
-- **User-tracked tools**: custom patterns added by the user via the dashboard
+- **User-tracked tools**: custom patterns added by the user via the dashboard; optionally submitted to maintainers for inclusion in the community list
+- **Community patterns**: curated tool patterns fetched from `api.agent-budget.net/patterns.json` and refreshed hourly — expands detection coverage automatically as new payment tools are discovered by the community
 
 For each detected payment, the log captures: service URL/name, amount/currency/chain, transaction hash, idempotency key, triggering skill, user request, input hash (for loop detection), execution time, failure type (pre_payment vs post_payment), and status.
 
