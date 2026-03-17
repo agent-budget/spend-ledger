@@ -1,0 +1,31 @@
+#!/usr/bin/env bash
+# log-transaction.sh — Append a transaction record to the agent-budget log.
+#
+# Usage:
+#   log-transaction.sh '<json_object>'
+#
+# The JSON object should contain fields matching the transaction schema:
+#   service.url, service.name, service.category,
+#   amount.value, amount.currency, amount.chain,
+#   tx_hash, context.session_key, context.skill,
+#   context.user_request, context.tool_name, context.tool_args_summary,
+#   status
+#
+# Fields not provided will be filled with defaults by the logging module.
+
+set -euo pipefail
+
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+SERVER_DIR="$SCRIPT_DIR/../server"
+
+if [ $# -lt 1 ]; then
+  echo "Usage: log-transaction.sh '<json_object>'" >&2
+  exit 1
+fi
+
+node --input-type=module -e "
+import { appendTransaction } from '${SERVER_DIR}/transactions.js';
+const txn = JSON.parse(process.argv[1]);
+const record = appendTransaction(txn);
+console.log(JSON.stringify(record, null, 2));
+" "$1"

@@ -1,0 +1,12 @@
+{
+  "name": "agent-budget",
+  "version": "0.1.0",
+  "description": "OpenClaw skill that tracks agent payments and presents them as a reviewable statement",
+  "type": "module",
+  "scripts": {
+    "start": "node server/server.js",
+    "test": "node --test test/test.js"
+  },
+  "keywords": ["openclaw", "skill", "x402", "budget", "payments"],
+  "license": "MIT"
+}
