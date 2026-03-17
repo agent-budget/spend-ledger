@@ -1,11 +1,36 @@
 import { createHash, randomBytes } from "node:crypto";
-import { readFileSync, appendFileSync, existsSync, mkdirSync } from "node:fs";
+import { readFileSync, appendFileSync, existsSync, mkdirSync, openSync, closeSync, unlinkSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 
 const DEFAULT_LOG_PATH = resolve(
   process.env.AGENT_BUDGET_LOG ||
     new URL("../data/transactions.jsonl", import.meta.url).pathname
 );
+
+// ── File locking ──────────────────────────────────────────────────────────────
+// The hash chain requires read-prev-hash → compute → append to be atomic
+// across processes. We use an O_EXCL lockfile to serialize writers.
+
+function acquireLock(logPath, retries = 20, delayMs = 50) {
+  const lockPath = logPath + ".lock";
+  for (let i = 0; i < retries; i++) {
+    try {
+      const fd = openSync(lockPath, "wx"); // O_WRONLY | O_CREAT | O_EXCL
+      closeSync(fd);
+      return lockPath;
+    } catch (err) {
+      if (err.code !== "EEXIST") throw err;
+      // Lock held by another process — busy wait
+      const deadline = Date.now() + delayMs;
+      while (Date.now() < deadline) { /* spin */ }
+    }
+  }
+  throw new Error(`Could not acquire lock on ${logPath} after ${retries} retries`);
+}
+
+function releaseLock(lockPath) {
+  try { unlinkSync(lockPath); } catch { /* already gone */ }
+}
 
 function sha256(data) {
   return createHash("sha256").update(data).digest("hex");
@@ -62,40 +87,45 @@ export function appendTransaction(txn, logPath = DEFAULT_LOG_PATH) {
     mkdirSync(dir, { recursive: true });
   }
 
-  // Deduplication
-  if (isDuplicate(txn.tx_hash || null, txn.idempotency_key || null, logPath)) {
-    return null;
+  const lockPath = acquireLock(logPath);
+  try {
+    // Deduplication — must happen inside the lock so we see the latest state
+    if (isDuplicate(txn.tx_hash || null, txn.idempotency_key || null, logPath)) {
+      return null;
+    }
+
+    const prevHash = getLastHash(logPath);
+
+    const record = {
+      id: txn.id || generateId(),
+      timestamp: txn.timestamp || new Date().toISOString(),
+      prev_hash: `sha256:${prevHash}`,
+      service: txn.service || { url: null, name: "unknown", category: null },
+      amount: txn.amount || { value: "0", currency: "unknown", chain: null },
+      tx_hash: txn.tx_hash || null,
+      idempotency_key: txn.idempotency_key || null,
+      context: {
+        session_key: null,
+        skill: null,
+        user_request: null,
+        tool_name: null,
+        tool_args_summary: null,
+        input_hash: null,
+        ...txn.context,
+      },
+      execution_time_ms: txn.execution_time_ms ?? null,
+      failure_type: txn.failure_type || null,
+      status: txn.status || "confirmed",
+      source: txn.source || "auto",
+    };
+
+    const line = JSON.stringify(record);
+    appendFileSync(logPath, line + "\n", { mode: 0o600 });
+
+    return record;
+  } finally {
+    releaseLock(lockPath);
   }
-
-  const prevHash = getLastHash(logPath);
-
-  const record = {
-    id: txn.id || generateId(),
-    timestamp: txn.timestamp || new Date().toISOString(),
-    prev_hash: `sha256:${prevHash}`,
-    service: txn.service || { url: null, name: "unknown", category: null },
-    amount: txn.amount || { value: "0", currency: "unknown", chain: null },
-    tx_hash: txn.tx_hash || null,
-    idempotency_key: txn.idempotency_key || null,
-    context: {
-      session_key: null,
-      skill: null,
-      user_request: null,
-      tool_name: null,
-      tool_args_summary: null,
-      input_hash: null,
-      ...txn.context,
-    },
-    execution_time_ms: txn.execution_time_ms ?? null,
-    failure_type: txn.failure_type || null, // null | "pre_payment" | "post_payment"
-    status: txn.status || "confirmed",
-    source: txn.source || "auto", // "auto" | "manual"
-  };
-
-  const line = JSON.stringify(record);
-  appendFileSync(logPath, line + "\n", { mode: 0o600 });
-
-  return record;
 }
 
 /**

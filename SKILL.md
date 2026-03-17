@@ -16,7 +16,8 @@ You have access to an agent spending tracker. Payments made through any tool —
 Manually log a payment transaction. Use when automatic detection missed a payment or for recording manual expenditures. Duplicates (same tx_hash or idempotency_key) are rejected.
 
 ```bash
-log-transaction.sh '{"service":{"url":"https://example.com/api","name":"Example Service"},"amount":{"value":"0.05","currency":"USDC","chain":"base"},"tx_hash":"0xabc...","idempotency_key":"req_123","context":{"skill":"research","user_request":"find AAPL data","input_hash":"a1b2c3"},"execution_time_ms":450,"status":"confirmed"}'
+# Preferred: pipe JSON via stdin to avoid shell escaping issues
+echo '{"service":{"url":"https://example.com/api","name":"Example Service"},"amount":{"value":"0.05","currency":"USDC","chain":"base"},"tx_hash":"0xabc...","idempotency_key":"req_123","context":{"skill":"research","user_request":"find AAPL data","input_hash":"a1b2c3"},"execution_time_ms":450,"status":"confirmed"}' | log-transaction.sh
 ```
 
 ### query-log.sh
