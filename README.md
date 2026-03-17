@@ -22,7 +22,7 @@ Existing dashboards track LLM inference costs (tokens consumed, API call prices)
 - **Deduplicated**: Same transaction hash or idempotency key won't be logged twice
 - **Dashboard**: Local web app with transaction list, daily/weekly/monthly rollups, per-service and per-skill breakdowns, and CSV/JSON export
 - **Manual tracking**: Log payments the auto-detection missed, and add custom tool patterns the detector should watch for
-- **Community feedback**: When adding a tracked tool, optionally submit the pattern to maintainers so it can be built into future versions
+- **Community patterns**: Running skills fetch a curated pattern list from `api.agent-budget.net/patterns.json` hourly — new community-contributed patterns are picked up automatically, no skill update required. When adding a tracked tool, optionally submit it to maintainers; patterns that reach 3 unique submitters are published
 
 ## Quick Start
 
@@ -85,14 +85,17 @@ agent-budget/
 ├── server/
 │   ├── transactions.js       # Data layer: append, query, summarize, hash chain, export
 │   ├── detectors.js          # Payment detection: registry of pattern matchers
+│   ├── patterns-sync.js      # Community pattern sync: fetch/cache api.agent-budget.net/patterns.json
 │   ├── server.js             # HTTP server: API endpoints + dashboard
 │   └── index.html            # Dashboard UI (single HTML file, no build step)
 ├── references/
 │   └── payment-tools.md      # Detector signatures for each known payment tool
 ├── data/
-│   ├── transactions.jsonl    # Append-only transaction log (created at runtime)
-│   ├── tracked-tools.json    # User-defined tool patterns (created at runtime)
-│   └── submissions.jsonl     # Suggestions sent to maintainers (created at runtime)
+│   ├── transactions.jsonl      # Append-only transaction log (created at runtime)
+│   ├── tracked-tools.json      # User-defined tool patterns (created at runtime)
+│   ├── community-patterns.json # Cached community patterns from api.agent-budget.net (created at runtime)
+│   ├── install-id.json         # Stable per-install UUID for anonymous submissions (created at runtime)
+│   └── submissions.jsonl       # Local log of patterns sent to maintainers (created at runtime)
 └── test/
     └── test.js               # 32 tests (transactions, detectors, server API)
 ```
