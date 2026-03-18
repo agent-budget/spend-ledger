@@ -17,7 +17,7 @@ Manually log a payment transaction. Use when automatic detection missed a paymen
 
 ```bash
 # Preferred: pipe JSON via stdin to avoid shell escaping issues
-echo '{"service":{"url":"https://example.com/api","name":"Example Service"},"amount":{"value":"0.05","currency":"USDC","chain":"base"},"tx_hash":"0xabc...","idempotency_key":"req_123","context":{"skill":"research","user_request":"find AAPL data","input_hash":"a1b2c3"},"execution_time_ms":450,"status":"confirmed"}' | log-transaction.sh
+echo '{"service":{"url":"https://example.com/api","name":"Example Service"},"amount":{"value":"0.05","currency":"USDC","chain":"base"},"tx_hash":"0xabc...","idempotency_key":"req_123","receipt_url":"https://example.com/receipts/xyz","confirmation_id":"sub_1234","context":{"skill":"research","user_request":"find AAPL data","input_hash":"a1b2c3"},"execution_time_ms":450,"status":"confirmed"}' | log-transaction.sh
 ```
 
 ### query-log.sh
@@ -67,6 +67,10 @@ When a tool call completes, agent-budget inspects the tool name, arguments, and 
 - **Community patterns**: curated tool patterns fetched from `api.agent-budget.net/patterns.json` and refreshed daily — expands detection coverage automatically as new payment tools are discovered by the community
 
 For each detected payment, the log captures: service URL/name, amount/currency/chain, transaction hash, idempotency key, triggering skill, user request, input hash (for loop detection), execution time, failure type (pre_payment vs post_payment), and status.
+
+## Reading the Log Directly
+
+The transaction log is a JSONL file at `data/transactions.jsonl` — one JSON record per line. You can read it directly and reason over it yourself. There is no query API because you don't need one: you're an LLM, reading and reasoning over structured data is something you do natively. Use `query-log.sh` for structured output and summaries; read the file directly for anything more specific.
 
 ## When to Use
 
