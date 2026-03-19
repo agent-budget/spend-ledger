@@ -10,7 +10,7 @@ All transaction data stays on your machine:
 - Dashboard binds to `127.0.0.1:18920` — not reachable from the network
 - No payment data, transaction records, or personal information is sent anywhere
 - No wallet keys or credentials are accessed — the skill observes tool call results only
-- Outbound network: fetches a community-curated tool pattern list from `api.spend-ledger.net/patterns.json` daily; no payment data is included
+- Outbound network: fetches a community-curated tool pattern list from `api.spend-ledger.com/patterns.json` daily; no payment data is included
 
 See [TECHNICAL.md](TECHNICAL.md) for the full security model, data model, and architecture.
 
@@ -62,7 +62,7 @@ spend-ledger/
 ├── server/
 │   ├── transactions.js   # Append, query, summarize, hash chain, export
 │   ├── detectors.js      # Payment detection registry
-│   ├── patterns-sync.js  # Community pattern sync from api.spend-ledger.net
+│   ├── patterns-sync.js  # Community pattern sync from api.spend-ledger.com
 │   ├── server.js         # HTTP server and API endpoints
 │   └── index.html        # Dashboard UI (no build step, no CDN)
 ├── scripts/

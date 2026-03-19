@@ -1,7 +1,7 @@
 /**
  * Community pattern sync.
  *
- * Fetches the curated patterns.json from api.agent-budget.net and caches it
+ * Fetches the curated patterns.json from api.spend-ledger.com and caches it
  * to disk so detectors.js can merge it with local tracked-tools at runtime.
  *
  * Also provides a stable submitter_hash (SHA-256 of a per-install UUID) used
@@ -19,7 +19,7 @@ import { resolve, dirname } from "node:path";
 
 const PATTERNS_URL =
   process.env.SPEND_LEDGER_PATTERNS_URL ||
-  "https://api.agent-budget.net/patterns.json";
+  "https://api.spend-ledger.com/patterns.json";
 
 const CACHE_PATH = resolve(
   process.env.SPEND_LEDGER_COMMUNITY_PATTERNS ||
@@ -110,13 +110,13 @@ export async function syncPatterns() {
 }
 
 /**
- * POST a single pattern submission to api.agent-budget.net/patterns.
+ * POST a single pattern submission to api.spend-ledger.com/patterns.
  * Returns true on success, false on failure. Never throws.
  */
 export async function submitPattern({ tool_name_pattern, description, category }) {
   try {
     const res = await fetch(
-      (process.env.SPEND_LEDGER_PATTERNS_URL || "https://api.agent-budget.net") + "/patterns",
+      (process.env.SPEND_LEDGER_PATTERNS_URL || "https://api.spend-ledger.com") + "/patterns",
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
