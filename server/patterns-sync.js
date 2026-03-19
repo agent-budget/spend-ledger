@@ -18,11 +18,11 @@ import {
 import { resolve, dirname } from "node:path";
 
 const PATTERNS_URL =
-  process.env.AGENT_BUDGET_PATTERNS_URL ||
+  process.env.SPEND_LEDGER_PATTERNS_URL ||
   "https://api.agent-budget.net/patterns.json";
 
 const CACHE_PATH = resolve(
-  process.env.AGENT_BUDGET_COMMUNITY_PATTERNS ||
+  process.env.SPEND_LEDGER_COMMUNITY_PATTERNS ||
     new URL("../data/community-patterns.json", import.meta.url).pathname
 );
 
@@ -89,7 +89,7 @@ export function loadCachedPatterns() {
 export async function syncPatterns() {
   try {
     const res = await fetch(PATTERNS_URL, {
-      headers: { "User-Agent": "agent-budget-skill/1.0" },
+      headers: { "User-Agent": "spend-ledger-skill/1.0" },
       signal: AbortSignal.timeout(10_000),
     });
     if (!res.ok) {
@@ -116,7 +116,7 @@ export async function syncPatterns() {
 export async function submitPattern({ tool_name_pattern, description, category }) {
   try {
     const res = await fetch(
-      (process.env.AGENT_BUDGET_PATTERNS_URL || "https://api.agent-budget.net") + "/patterns",
+      (process.env.SPEND_LEDGER_PATTERNS_URL || "https://api.agent-budget.net") + "/patterns",
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },

@@ -20,7 +20,7 @@ import {
 import { SUGGESTIONS_PATH } from "./detectors.js";
 import { syncPatterns, submitPattern } from "./patterns-sync.js";
 
-const PORT = parseInt(process.env.AGENT_BUDGET_PORT || "18920", 10);
+const PORT = parseInt(process.env.SPEND_LEDGER_PORT || "18920", 10);
 const HOST = "127.0.0.1";
 
 const DASHBOARD_PATH = resolve(
@@ -28,7 +28,7 @@ const DASHBOARD_PATH = resolve(
 );
 
 const SUBMISSIONS_PATH = resolve(
-  process.env.AGENT_BUDGET_SUBMISSIONS ||
+  process.env.SPEND_LEDGER_SUBMISSIONS ||
     new URL("../data/submissions.jsonl", import.meta.url).pathname
 );
 
@@ -187,7 +187,7 @@ const server = createServer(async (req, res) => {
         if (format === "json") {
           json(res, { transactions: txns });
         } else {
-          const filename = `agent-budget-${new Date().toISOString().slice(0, 10)}.csv`;
+          const filename = `spend-ledger-${new Date().toISOString().slice(0, 10)}.csv`;
           csvResponse(res, toCSV(txns), filename);
         }
         return;
@@ -297,7 +297,7 @@ const server = createServer(async (req, res) => {
 });
 
 server.listen(PORT, HOST, () => {
-  console.log(`agent-budget dashboard running at http://${HOST}:${PORT}`);
+  console.log(`spend-ledger dashboard running at http://${HOST}:${PORT}`);
 });
 
 // Sync community patterns on startup, then refresh every hour

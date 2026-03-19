@@ -1,5 +1,5 @@
 {
-  "name": "agent-budget",
+  "name": "spend-ledger",
   "version": "0.1.0",
   "description": "OpenClaw skill that tracks agent payments and presents them as a reviewable statement",
   "type": "module",

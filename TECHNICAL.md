@@ -2,7 +2,7 @@
 
 ## Overview
 
-agent-budget is an OpenClaw skill that provides financial observability for autonomous agents. It answers the question "what did my agent spend?" by detecting payment tool calls, logging them to a tamper-evident local ledger, and presenting them through a local web dashboard.
+spend-ledger is an OpenClaw skill that provides financial observability for autonomous agents. It answers the question "what did my agent spend?" by detecting payment tool calls, logging them to a tamper-evident local ledger, and presenting them through a local web dashboard.
 
 The system has three layers:
 
@@ -16,7 +16,7 @@ All three layers run locally. Nothing leaves the machine.
 
 ## Security Model
 
-Security is not a feature of agent-budget — it is the reason agent-budget exists. An agent spending money on your behalf without accountability is a fundamental trust problem. The security model is designed around three principles:
+Security is not a feature of spend-ledger — it is the reason spend-ledger exists. An agent spending money on your behalf without accountability is a fundamental trust problem. The security model is designed around three principles:
 
 ### 1. The log is the source of truth
 
@@ -45,13 +45,13 @@ If anyone modifies, deletes, or reorders a historical record, the chain breaks. 
 
 ### 3. Minimal attack surface
 
-agent-budget is designed to need as little access as possible:
+spend-ledger is designed to need as little access as possible:
 
 | Capability | Required? | Why |
 |---|---|---|
 | Read tool call results | Yes | Core function — detecting payments |
 | Write to its own data directory | Yes | Transaction log, tracked tools, submissions |
-| Network access (outbound) | Fetch only | Fetches `api.agent-budget.net/patterns.json` daily — no payment data included |
+| Network access (outbound) | Fetch only | Fetches `api.spend-ledger.net/patterns.json` daily — no payment data included |
 | Network access (inbound) | Localhost only | Dashboard server binds to `127.0.0.1`, never `0.0.0.0` |
 | Wallet keys or credentials | **No** | Observes results, never initiates payments |
 | Shell execution (exec) | **No** | Shell scripts are tools the agent calls, not the skill itself |
@@ -74,7 +74,7 @@ Transaction hashes and idempotency keys are stored in full because they are need
 
 ### No Credential Storage
 
-agent-budget never stores, reads, or has access to:
+spend-ledger never stores, reads, or has access to:
 - Wallet private keys
 - API keys (except fragments that appear in truncated tool argument summaries)
 - Session tokens
@@ -84,7 +84,7 @@ It operates purely on the output side of tool calls — it sees what happened af
 
 ### Deduplication as a Safety Mechanism
 
-Duplicate payments are a real risk with autonomous agents. Retries, loops, and race conditions can cause the same payment to execute multiple times. agent-budget deduplicates on two axes:
+Duplicate payments are a real risk with autonomous agents. Retries, loops, and race conditions can cause the same payment to execute multiple times. spend-ledger deduplicates on two axes:
 
 - **Transaction hash**: If a tx_hash already exists in the log, the new record is rejected
 - **Idempotency key**: If an idempotency_key already exists, the record is rejected
@@ -149,9 +149,9 @@ Users can add custom tool patterns via the dashboard's "Track Tools" tab or the 
 
 ### Community Patterns
 
-On startup and every hour, the skill fetches `api.agent-budget.net/patterns.json` and caches it to `data/community-patterns.json`. `detectUserTracked()` merges local and community patterns at detection time — local patterns take priority on any conflict. This allows the published pattern list to expand without requiring a skill update.
+On startup and every hour, the skill fetches `api.spend-ledger.net/patterns.json` and caches it to `data/community-patterns.json`. `detectUserTracked()` merges local and community patterns at detection time — local patterns take priority on any conflict. This allows the published pattern list to expand without requiring a skill update.
 
-Community patterns are maintained at [github.com/mattpolly/agent-budget.net](https://github.com/mattpolly/agent-budget.net). The fetch is read-only; no payment data or transaction records are included in any request to that host. The only outbound write is an opt-in pattern submission from the dashboard (`data/submissions.jsonl` records what was sent locally).
+Community patterns are maintained at [github.com/mattpolly/spend-ledger.net](https://github.com/mattpolly/spend-ledger.net). The fetch is read-only; no payment data or transaction records are included in any request to that host. The only outbound write is an opt-in pattern submission from the dashboard (`data/submissions.jsonl` records what was sent locally).
 
 ### Detection Confidence
 
@@ -271,7 +271,7 @@ All files are created with mode `0600` (owner read/write only).
 
 ### API Endpoints
 
-All endpoints are served on `127.0.0.1:18920` (configurable via `AGENT_BUDGET_PORT`).
+All endpoints are served on `127.0.0.1:18920` (configurable via `SPEND_LEDGER_PORT`).
 
 | Method | Path | Description |
 |---|---|---|
@@ -314,17 +314,17 @@ The server binds to `127.0.0.1`, not `0.0.0.0`. This means:
 
 ### Current: tool_result_persist (v0.1)
 
-agent-budget uses the `tool_result_persist` hook, which fires synchronously after every tool call completes. This hook is available in OpenClaw today and does not require any core changes.
+spend-ledger uses the `tool_result_persist` hook, which fires synchronously after every tool call completes. This hook is available in OpenClaw today and does not require any core changes.
 
-The hook receives the tool name, arguments, and result. agent-budget passes these to the detector registry, and if a payment is detected, appends a record to the log.
+The hook receives the tool name, arguments, and result. spend-ledger passes these to the detector registry, and if a payment is detected, appends a record to the log.
 
-**Limitation**: This hook fires after the tool has already executed. agent-budget can observe and log, but cannot block or modify the payment. This is by design for v0.1.
+**Limitation**: This hook fires after the tool has already executed. spend-ledger can observe and log, but cannot block or modify the payment. This is by design for v0.1.
 
 ### Future: before_tool_call (v0.2)
 
 The `before_tool_call` hook is defined in OpenClaw's `plugins/hooks.js` and exported via `createHookRunner()`, but is not currently wired into the tool execution pipeline. Multiple open issues request this (#5943, #7597, #12311, #30504).
 
-When wired, this hook would allow agent-budget to:
+When wired, this hook would allow spend-ledger to:
 - Check proposed payments against budget limits before they execute
 - Block payments that exceed caps or hit blocklisted services
 - Require human approval for payments above a threshold
@@ -357,7 +357,7 @@ The dashboard binds to `127.0.0.1`. Only processes on the local machine can reac
 
 ### Why copy-install instead of symlink?
 
-OpenClaw's `resolveContainedSkillPath` resolves symlinks and rejects paths that escape the skills directory root. This is a security feature — it prevents a skill from symlinking to arbitrary file system locations. agent-budget respects this by requiring a copy installation.
+OpenClaw's `resolveContainedSkillPath` resolves symlinks and rejects paths that escape the skills directory root. This is a security feature — it prevents a skill from symlinking to arbitrary file system locations. spend-ledger respects this by requiring a copy installation.
 
 ---
 

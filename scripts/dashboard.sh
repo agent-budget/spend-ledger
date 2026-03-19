@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# dashboard.sh — Start, stop, or check the agent-budget dashboard server.
+# dashboard.sh — Start, stop, or check the spend-ledger dashboard server.
 #
 # Usage:
 #   dashboard.sh start   — Start the dashboard server (background)
@@ -13,7 +13,7 @@ SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 SERVER_DIR="$SCRIPT_DIR/../server"
 DATA_DIR="$SCRIPT_DIR/../data"
 PID_FILE="$DATA_DIR/dashboard.pid"
-PORT="${AGENT_BUDGET_PORT:-18920}"
+PORT="${SPEND_LEDGER_PORT:-18920}"
 
 mkdir -p "$DATA_DIR"
 

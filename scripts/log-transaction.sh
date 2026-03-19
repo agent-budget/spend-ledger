@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# log-transaction.sh — Append a transaction record to the agent-budget log.
+# log-transaction.sh — Append a transaction record to the spend-ledger log.
 #
 # Usage (argument):
 #   log-transaction.sh '<json_object>'

@@ -22,7 +22,7 @@ describe("transactions", () => {
   let logPath;
 
   before(() => {
-    tmpDir = mkdtempSync(join(tmpdir(), "agent-budget-test-"));
+    tmpDir = mkdtempSync(join(tmpdir(), "spend-ledger-test-"));
     logPath = join(tmpDir, "test.jsonl");
   });
 
@@ -362,17 +362,17 @@ describe("server API", () => {
   const port = 18921; // Use different port for tests
 
   before(async () => {
-    tmpDir = mkdtempSync(join(tmpdir(), "agent-budget-server-test-"));
+    tmpDir = mkdtempSync(join(tmpdir(), "spend-ledger-server-test-"));
     // Start server with custom port and log path
     const { spawn } = await import("node:child_process");
     serverProcess = spawn("node", ["server/server.js"], {
       cwd: join(import.meta.url.replace("file://", ""), "../../"),
       env: {
         ...process.env,
-        AGENT_BUDGET_PORT: String(port),
-        AGENT_BUDGET_LOG: join(tmpDir, "txns.jsonl"),
-        AGENT_BUDGET_SUGGESTIONS: join(tmpDir, "tracked.json"),
-        AGENT_BUDGET_SUBMISSIONS: join(tmpDir, "submissions.jsonl"),
+        SPEND_LEDGER_PORT: String(port),
+        SPEND_LEDGER_LOG: join(tmpDir, "txns.jsonl"),
+        SPEND_LEDGER_SUGGESTIONS: join(tmpDir, "tracked.json"),
+        SPEND_LEDGER_SUBMISSIONS: join(tmpDir, "submissions.jsonl"),
       },
     });
     // Wait for server to start

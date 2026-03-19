@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# query-log.sh — Query the agent-budget transaction log.
+# query-log.sh — Query the spend-ledger transaction log.
 #
 # Usage:
 #   query-log.sh [--from DATE] [--to DATE] [--service NAME] [--skill NAME] [--summary daily|weekly|monthly] [--by-service] [--by-skill] [--verify]

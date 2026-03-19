@@ -1,4 +1,4 @@
-# agent-budget
+# spend-ledger
 
 Payment tracker for OpenClaw agents. Detects payments made through wallet tools, logs them to a tamper-evident local ledger, and presents them in a dashboard.
 
@@ -10,20 +10,20 @@ All transaction data stays on your machine:
 - Dashboard binds to `127.0.0.1:18920` — not reachable from the network
 - No payment data, transaction records, or personal information is sent anywhere
 - No wallet keys or credentials are accessed — the skill observes tool call results only
-- Outbound network: fetches a community-curated tool pattern list from `api.agent-budget.net/patterns.json` daily; no payment data is included
+- Outbound network: fetches a community-curated tool pattern list from `api.spend-ledger.net/patterns.json` daily; no payment data is included
 
 See [TECHNICAL.md](TECHNICAL.md) for the full security model, data model, and architecture.
 
 ## Install
 
 ```bash
-clawhub install agent-budget
+clawhub install spend-ledger
 ```
 
 Or manually:
 
 ```bash
-git clone https://github.com/agent-budget/agent-budget.git ~/.openclaw/skills/agent-budget
+git clone https://github.com/spend-ledger/spend-ledger.git ~/.openclaw/skills/spend-ledger
 ```
 
 ## Use
@@ -37,13 +37,13 @@ Or use the CLI directly:
 
 ```bash
 # Spending summary
-~/.openclaw/skills/agent-budget/scripts/query-log.sh --summary daily
+~/.openclaw/skills/spend-ledger/scripts/query-log.sh --summary daily
 
 # Visual dashboard at http://127.0.0.1:18920
-~/.openclaw/skills/agent-budget/scripts/dashboard.sh start
+~/.openclaw/skills/spend-ledger/scripts/dashboard.sh start
 
 # Verify log integrity
-~/.openclaw/skills/agent-budget/scripts/query-log.sh --verify
+~/.openclaw/skills/spend-ledger/scripts/query-log.sh --verify
 ```
 
 ## Requirements
@@ -55,14 +55,14 @@ Or use the CLI directly:
 ## Project Structure
 
 ```
-agent-budget/
+spend-ledger/
 ├── SKILL.md              # Agent-facing instructions (what the LLM reads)
 ├── README.md             # This file
 ├── TECHNICAL.md          # Architecture, security model, data model
 ├── server/
 │   ├── transactions.js   # Append, query, summarize, hash chain, export
 │   ├── detectors.js      # Payment detection registry
-│   ├── patterns-sync.js  # Community pattern sync from api.agent-budget.net
+│   ├── patterns-sync.js  # Community pattern sync from api.spend-ledger.net
 │   ├── server.js         # HTTP server and API endpoints
 │   └── index.html        # Dashboard UI (no build step, no CDN)
 ├── scripts/

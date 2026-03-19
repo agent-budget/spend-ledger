@@ -1,11 +1,11 @@
 ---
-name: agent-budget
+name: spend-ledger
 description: Tracks every payment your agent makes and presents it as a reviewable transaction statement. Dashboard at http://127.0.0.1:18920 (run dashboard.sh start)
 metadata:
   { "openclaw": { "emoji": "💰" } }
 ---
 
-# agent-budget
+# spend-ledger
 
 You have access to an agent spending tracker. Payments made through any tool — wallet tools (agent-wallet-cli, v402, ClawRouter, payment-skill), traditional payment APIs (Stripe, PayPal, etc.), crypto transfers, or any other payment mechanism — are detected and logged automatically. The log is tamper-evident (hash-chained) and deduplicated by transaction hash and idempotency key.
 
@@ -58,7 +58,7 @@ dashboard.sh url      # Print dashboard URL
 
 ## Automatic Detection
 
-When a tool call completes, agent-budget inspects the tool name, arguments, and result to determine if a payment occurred. Detection covers:
+When a tool call completes, spend-ledger inspects the tool name, arguments, and result to determine if a payment occurred. Detection covers:
 
 - **Known payment tools**: agent-wallet-cli, v402, ClawRouter, payment-skill, Stripe, PayPal, and other common payment APIs
 - **Heuristic detection**: tools named `stripe_*`, `paypal_*`, `checkout`, `purchase`, `buy`, etc., plus argument patterns containing monetary amounts with currency/recipient signals — logged as `status: "unverified"` since there is no formal payment signal; the owner should review these

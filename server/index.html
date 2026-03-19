@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>agent-budget</title>
+<title>spend-ledger</title>
 <style>
   :root {
     --bg: #0d1117;
@@ -145,7 +145,7 @@
 
 <div class="header">
   <div>
-    <h1>agent-budget</h1>
+    <h1>spend-ledger</h1>
     <span style="font-size:0.8rem;color:var(--text-muted)">Agent spending tracker</span>
   </div>
   <div class="header-right">
@@ -216,7 +216,7 @@
   <!-- Track a tool -->
   <div class="form-section">
     <h3>Track a tool</h3>
-    <p class="hint" style="margin-bottom:10px">Tell agent-budget to watch for a tool that makes payments. Any future calls to tools matching this pattern will be automatically logged.</p>
+    <p class="hint" style="margin-bottom:10px">Tell spend-ledger to watch for a tool that makes payments. Any future calls to tools matching this pattern will be automatically logged.</p>
     <div class="form-row">
       <label>Tool name pattern
         <input type="text" id="trackPattern" placeholder="e.g. stripe_charge or browser_checkout">
@@ -230,7 +230,7 @@
     </div>
     <div class="checkbox-row">
       <input type="checkbox" id="trackSubmit">
-      <label for="trackSubmit">Send to agent-budget maintainers so this can be built into future versions</label>
+      <label for="trackSubmit">Send to spend-ledger maintainers so this can be built into future versions</label>
     </div>
     <div style="margin-top:10px">
       <button class="btn btn-accent" onclick="addTrackedTool()">Track This Tool</button>
