@@ -1,8 +1,17 @@
 ---
 name: spend-ledger
-description: Tracks every payment your agent makes and presents it as a reviewable transaction statement. Dashboard at http://127.0.0.1:18920 (run dashboard.sh start)
+description: Tamper-evident payment ledger for autonomous agents — auto-detects payments across all tools, prevents duplicate payments, and presents full spending history.
+version: 0.3.0
 metadata:
-  { "openclaw": { "emoji": "💰" } }
+  openclaw:
+    emoji: "💰"
+    homepage: https://spend-ledger.com
+    requires:
+      bins:
+        - node
+    os:
+      - macos
+      - linux
 ---
 
 # spend-ledger

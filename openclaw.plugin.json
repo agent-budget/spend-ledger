@@ -1,7 +1,7 @@
 {
   "id": "spend-ledger",
   "name": "spend-ledger",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Payment tracker for OpenClaw agents — logs spending, prevents duplicate payments",
   "skills": ["SKILL.md"],
   "configSchema": {
